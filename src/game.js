@@ -144,9 +144,20 @@ var Player = function() {
   this.fixedpos = [{x:325,y:90}, {x:357,y:185}, {x:389,y:281}, {x:421,y:377}]
   this.currentpos = 3;
 
+  var freeup = false; // Control over key 'up' press
+  var freedown = false; // Control over key 'down' press
+
   this.step = function() {
-    if(Game.keys['up']) { this.currentpos = this.currentpos == 0 ? this.fixedpos.length - 1 : --this.currentpos; }
-    else if(Game.keys['down']) { this.currentpos = ++this.currentpos % this.fixedpos.length; }
+    if(!Game.keys['up']) {freeup = true;}
+    if(!Game.keys['down']) {freedown = true;}
+    if(freeup && Game.keys['up']) {
+      this.currentpos = this.currentpos == 0 ? this.fixedpos.length - 1 : --this.currentpos;
+      freeup = false;
+    }
+    else if(freedown && Game.keys['down']) {
+      this.currentpos = ++this.currentpos % this.fixedpos.length;
+      freedown = false;
+    }
 
     this.x = this.fixedpos[this.currentpos].x;
     this.y = this.fixedpos[this.currentpos].y;
