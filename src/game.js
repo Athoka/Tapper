@@ -1,10 +1,10 @@
 var sprites = {
-  background: { sx: 0, sy: 481, w: 513, h: 479, frames: 1 },
-  bartender: { sx: 510, sy: 0, w: 58, h: 65, frames: 1},
-  client: { sx: 512, sy: 66, w: 33, h: 35, frames: 1},
-  fullbeer: { sx: 512, sy: 100, w: 23, h: 31, frames: 1},
-  emptybeer: { sx: 512, sy: 133, w: 23, h: 31, frames: 1},
-  backwall: { sx: 0, sy: 0, w: 133, h: 479, frames: 1}
+  Background: { sx: 0, sy: 480, w: 512, h: 480, frames: 1 },
+  Player: { sx: 512, sy: 0, w: 56, h: 66, frames: 1},
+  NPC: { sx: 512, sy: 66, w: 33, h: 33, frames: 1},
+  Beer: { sx: 512, sy: 99, w: 23, h: 32, frames: 1},
+  Glass: { sx: 512, sy: 131, w: 23, h: 32, frames: 1},
+  LeftWall: { sx: 0, sy: 0, w: 512, h: 480, frames: 1}
 };
 
 var enemies = {
@@ -57,9 +57,13 @@ var level1 = [
 
 
 var playGame = function() {
-  Game.setBoard(0, new Background());
-  Game.setBoard(1, new Player());
-  //Game.setBoard(5,new GamePoints(0));
+  var backboard = new GameBoard();
+  backboard.add(new Background());
+  Game.setBoard(0, backboard);
+
+  var board = new GameBoard();
+  board.add(new Player());
+  Game.setBoard(3,board);
 };
 
 var winGame = function() {
@@ -135,8 +139,29 @@ var Starfield = function(speed,opacity,numStars,clear) {
   };
 };
 
+var Beer = function(x,y,vx) {
+  this.setup('Beer');
+  this.x = x;
+  this.y = y;
+  this.vx = -vx;
+};
+
+Beer.prototype = new Sprite();
+Beer.prototype.type = OBJECT_PLAYER_PROJECTILE;
+
+Beer.prototype.step = function(dt)  {
+  this.x += this.vx * dt;
+  /*var collision = this.board.collide(this,OBJECT_ENEMY);
+  if(collision) {
+    collision.hit(this.damage);
+    this.board.remove(this);
+  } else if(this.y < -this.h) {
+      this.board.remove(this);
+  }*/
+};
+
 var Player = function() {
-  this.setup('bartender', { vy: 0, reloadTime: 0.25, maxVel: 200 });
+  this.setup('Player', { vy: 0, reloadTime: 0.25});
 
   this.reload = this.reloadTime;
   this.x = 421;
@@ -146,10 +171,12 @@ var Player = function() {
 
   var freeup = false; // Control over key 'up' press
   var freedown = false; // Control over key 'down' press
+  var freespace = false; // Control over key 'space' press
 
   this.step = function() {
     if(!Game.keys['up']) {freeup = true;}
     if(!Game.keys['down']) {freedown = true;}
+    if(!Game.keys['space']) {freespace = true;}
     if(freeup && Game.keys['up']) {
       this.currentpos = this.currentpos == 0 ? this.fixedpos.length - 1 : --this.currentpos;
       freeup = false;
@@ -157,6 +184,30 @@ var Player = function() {
     else if(freedown && Game.keys['down']) {
       this.currentpos = ++this.currentpos % this.fixedpos.length;
       freedown = false;
+    }
+    else if(freespace && Game.keys['space']) {
+      //TODO Throw a beer
+      var clone = Object.create(Beer, {
+          'x': {
+            value: this.x,
+            enumerable: true,
+            writable: true
+          },
+          'y': {
+            value: this.y,
+            enumerable: true,
+            writable: true
+          },
+          'vx': {
+            value: 200,
+            enumerable: true
+          }
+      })
+      clone.prototype = Beer.prototype;
+      clone.prototype.type = Beer.prototype.type;
+      clone.prototype.step = Beer.prototype.step;
+      this.board.add(clone);
+      freespace = false;
     }
 
     this.x = this.fixedpos[this.currentpos].x;
@@ -166,27 +217,6 @@ var Player = function() {
 
 Player.prototype = new Sprite();
 Player.prototype.type = OBJECT_PLAYER;
-
-
-var PlayerMissile = function(x,y) {
-  this.setup('missile',{ vy: -700, damage: 10 });
-  this.x = x - this.w/2;
-  this.y = y - this.h;
-};
-
-PlayerMissile.prototype = new Sprite();
-PlayerMissile.prototype.type = OBJECT_PLAYER_PROJECTILE;
-
-PlayerMissile.prototype.step = function(dt)  {
-  this.y += this.vy * dt;
-  var collision = this.board.collide(this,OBJECT_ENEMY);
-  if(collision) {
-    collision.hit(this.damage);
-    this.board.remove(this);
-  } else if(this.y < -this.h) {
-      this.board.remove(this);
-  }
-};
 
 
 var Enemy = function(blueprint,override) {
@@ -291,7 +321,7 @@ window.addEventListener("load", function() {
 
 
 var Background = function() {
-  this.setup('background');
+  this.setup('Background');
 
   this.x = 0;
   this.y = 0;
