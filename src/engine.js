@@ -106,6 +106,7 @@ const Game = new function() {
 
   // Change an active game board
   this.setBoard = function(num,board) { boards[num] = board; };
+  this.unsetBoard = function(num) { this.boards = this.boards.splice(num,1); };
 
 
   this.setupMobile = function() {
@@ -146,7 +147,6 @@ const Game = new function() {
     this.canvas.style.top="0px";
 
   };
-
 };
 
 
@@ -177,8 +177,8 @@ var SpriteSheet = new function() {
 var TitleScreen = function TitleScreen(title,subtitle,callback) {
   var up = false;
   this.step = function(dt) {
-    if(!Game.keys['fire']) up = true;
-    if(up && Game.keys['fire'] && callback) callback();
+    if(!Game.keys['space']) up = true;
+    if(up && Game.keys['space'] && callback) callback();
   };
 
   this.draw = function(ctx) {
@@ -247,7 +247,7 @@ var GameBoard = function() {
     for(var i=0,len=this.objects.length;i<len;i++) {
       var obj = this.objects[i];
       obj[funcName].apply(obj,args);
-     }
+    }
   };
 
   // Find the first object for which func is true
@@ -288,8 +288,6 @@ var GameBoard = function() {
       }
     });
   };
-
-
 };
 
 var Sprite = function() { };
