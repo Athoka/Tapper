@@ -1,77 +1,89 @@
 (function() {
-    var lastTime = 0;
-    var vendors = ['ms', 'moz', 'webkit', 'o'];
-    for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
-        window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
-        window.cancelAnimationFrame =
-          window[vendors[x]+'CancelAnimationFrame'] || window[vendors[x]+'CancelRequestAnimationFrame'];
-    }
+  let lastTime = 0;
+  const vendors = ['ms', 'moz', 'webkit', 'o'];
+  for(let x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+      window.requestAnimationFrame =
+          window[vendors[x] + 'RequestAnimationFrame'];
+      window.cancelAnimationFrame =
+          window[vendors[x] + 'CancelAnimationFrame'] ||
+          window[vendors[x] + 'CancelRequestAnimationFrame'];
+  }
 
-    if (!window.requestAnimationFrame)
-        window.requestAnimationFrame = function(callback, element) {
-            var currTime = new Date().getTime();
-            var timeToCall = Math.max(0, 16 - (currTime - lastTime));
-            var id = window.setTimeout(function() { callback(currTime + timeToCall); },
-              timeToCall);
-            lastTime = currTime + timeToCall;
-            return id;
+  if (!window.requestAnimationFrame) {
+    window.requestAnimationFrame =
+        function(callback, element) {
+          const currTime = new Date().getTime();
+          const timeToCall = Math.max(0, 16 - (currTime - lastTime));
+          const id =
+              window.setTimeout(
+                function() { callback(currTime + timeToCall); },
+                timeToCall
+              );
+          lastTime = currTime + timeToCall;
+          return id;
         };
+  }
 
-    if (!window.cancelAnimationFrame)
-        window.cancelAnimationFrame = function(id) {
+  if (!window.cancelAnimationFrame)
+      window.cancelAnimationFrame =
+          function(id) {
             clearTimeout(id);
-        };
+          };
 }());
 
 
-var Game = new function() {
-  var boards = [];
+const Game = new function() {
+  let boards = [];
 
   // Game Initialization
-  this.initialize = function(canvasElementId,sprite_data,callback) {
-    this.canvas = document.getElementById(canvasElementId);
+  this.initialize =
+      function(canvasElementId,sprite_data,callback) {
+        this.canvas = document.getElementById(canvasElementId);
 
-    this.playerOffset = 10;
-    this.canvasMultiplier= 1;
-    this.setupMobile();
+        this.playerOffset = 10;
+        this.canvasMultiplier= 1;
+        this.setupMobile();
 
-    this.width = this.canvas.width;
-    this.height= this.canvas.height;
+        this.width = this.canvas.width;
+        this.height= this.canvas.height;
 
-    this.ctx = this.canvas.getContext && this.canvas.getContext('2d');
-    if(!this.ctx) { return alert("Please upgrade your browser to play"); }
+        this.ctx = this.canvas.getContext && this.canvas.getContext('2d');
+        if(!this.ctx) { return alert("Please upgrade your browser to play"); }
 
-    this.setupInput();
+        this.setupInput();
 
-    this.loop();
+        this.loop();
 
-    if(this.mobile) {
-      this.setBoard(4,new TouchControls());
-    }
+        if(this.mobile) {
+          this.setBoard(4,new TouchControls());
+        }
 
-    SpriteSheet.load(sprite_data,callback);
-  };
+        SpriteSheet.load(sprite_data, callback);
+      };
 
 
   // Handle Input
-  var KEY_CODES = { 38:'up', 40:'down', 32 :'space' };
+  const KEY_CODES = {38: 'up', 40: 'down', 32: 'space'};
   this.keys = {};
 
-  this.setupInput = function() {
-    window.addEventListener('keydown',function(e) {
-      if(KEY_CODES[e.keyCode]) {
-       Game.keys[KEY_CODES[e.keyCode]] = true;
-       e.preventDefault();
-      }
-    },false);
+  this.setupInput =
+      function() {
+        window.addEventListener('keydown',
+            function(e) {
+              if(KEY_CODES[e.keyCode]) {
+                Game.keys[KEY_CODES[e.keyCode]] = true;
+                e.preventDefault();
+              }
+            }, false);
 
-    window.addEventListener('keyup',function(e) {
-      if(KEY_CODES[e.keyCode]) {
-       Game.keys[KEY_CODES[e.keyCode]] = false;
-       e.preventDefault();
-      }
-    },false);
-  };
+        window.addEventListener('keyup',
+            function(e) {
+              if(KEY_CODES[e.keyCode]) {
+                Game.keys[KEY_CODES[e.keyCode]] = false;
+                e.preventDefault();
+              }
+            }, false);
+      };
 
 
   var lastTime = new Date().getTime();
@@ -145,7 +157,7 @@ var SpriteSheet = new function() {
     this.map = spriteData;
     this.image = new Image();
     this.image.onload = callback;
-    this.image.src = 'img/spritesTapper.png';
+    this.image.src = 'img/sprites.png';
   };
 
   this.draw = function(ctx,sprite,x,y,frame) {
