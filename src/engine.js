@@ -107,6 +107,11 @@ const Game = new function() {
   // Change an active game board
   this.setBoard = function(num,board) { boards[num] = board; };
   this.unsetBoard = function(num) { this.boards = this.boards.splice(num,1); };
+  
+  this.activateBoard = function(num) { 
+    boards[num].activate();
+   };
+  this.deactivateBoard = function(num) { boards[num].deactivate(); };
 
 
   this.setupMobile = function() {
@@ -201,8 +206,9 @@ var TitleScreen = function TitleScreen(title,subtitle,callback) {
 };
 
 
-var GameBoard = function() {
-  var board = this;
+const GameBoard = function() {
+  let board = this;
+  let active = false;
 
   // The current list of objects
   this.objects = [];
@@ -243,6 +249,7 @@ var GameBoard = function() {
 
   // Call the same method on all current objects
   this.iterate = function(funcName) {
+    if (!this.active) return;
     var args = Array.prototype.slice.call(arguments,1);
     for(var i=0,len=this.objects.length;i<len;i++) {
       var obj = this.objects[i];
@@ -287,6 +294,14 @@ var GameBoard = function() {
         return col ? this : false;
       }
     });
+  };
+
+  this.activate = function() {
+    this.active = true;
+  };
+
+  this.deactivate = function() {
+    this.active = false;
   };
 };
 
