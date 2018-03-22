@@ -31,6 +31,21 @@ const BoardIds = {
   LEFT_WALL: 5,
 };
 
+const level1 = {
+  b0: {
+    pos: CLIENTS_FIXED_POS[0],
+    ld: [[0, 4000, 1000, 'standard'], [6000, 10000, 1000, 'standard']],
+  },
+  b1: { pos: CLIENTS_FIXED_POS[1], ld: [[1000, 5000, 2000, 'standard']] },
+  b2: { pos: CLIENTS_FIXED_POS[2], ld: [[2000, 6000, 2000, 'standard']] },
+  b3: { pos: CLIENTS_FIXED_POS[3], ld: [[3000, 7000, 2000, 'standard']] },
+};
+
+/** @enum */
+const clients = {
+  standard: { vx: 30, sprite: 'NPC' },
+};
+
 const startGame = function() {
   const ua = navigator.userAgent.toLowerCase();
 
@@ -82,9 +97,10 @@ const setup = function() {
   board.add(new Player());
 
   // spawner
-  for (let x = 0; x < 1; x++) {
-    const r = 2;
-    board.add(new Spawner(CLIENTS_FIXED_POS[x], 1, 'NPC', 1 + r * x));
+  for (let key in level1) {
+    if (level1.hasOwnProperty(key)) {
+      board.add(new Spawner(level1[key].pos, level1[key].ld));
+    }
   }
   Game.setBoard(BoardIds.ENTITIES, board);
 
@@ -130,35 +146,6 @@ const loseGame = function() {
 window.addEventListener('load', function() {
   Game.initialize('game', Sprites, startGame);
 });
-
-const Spawner = function(coord, nclients, type, f) {
-  this.initClients = nclients;
-  this.nclients = this.initClients;
-  this.type = type;
-  this.f = f;
-  this.time = this.f;
-  this.client = new Client(coord.x, coord.y, 100, type);
-
-  this.reset = function() {
-    this.time = this.f;
-    this.nclients = this.initClients;
-    GameManager.notifyClients(this.nclients);
-  };
-  this.reset();
-
-  this.step = function(dt) {
-    this.time -= dt;
-
-    if (this.nclients > 0 && this.time < 0) {
-      this.time = this.f;
-
-      this.board.add(Object.create(this.client));
-      --this.nclients;
-    }
-  };
-
-  this.draw = function() {};
-};
 
 /////////////// BEGIN GAME MANAGER ///////////////
 const GameManager = new function() {
