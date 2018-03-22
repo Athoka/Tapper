@@ -36,9 +36,9 @@ const level1 = {
     pos: CLIENTS_FIXED_POS[0],
     ld: [[0, 4000, 1000, 'standard'], [6000, 10000, 1000, 'standard']],
   },
-  b1: { pos: CLIENTS_FIXED_POS[1], ld: [[1000, 5000, 2000, 'standard']] },
-  b2: { pos: CLIENTS_FIXED_POS[2], ld: [[2000, 6000, 2000, 'standard']] },
-  b3: { pos: CLIENTS_FIXED_POS[3], ld: [[3000, 7000, 2000, 'standard']] },
+  b1: { pos: CLIENTS_FIXED_POS[1], ld: [[1000, 5000, 1000, 'standard']] },
+  b2: { pos: CLIENTS_FIXED_POS[2], ld: [[2000, 6000, 1500, 'standard']] },
+  b3: { pos: CLIENTS_FIXED_POS[3], ld: [[3000, 7000, 2500, 'standard']] },
 };
 
 /** @enum */
@@ -161,6 +161,7 @@ const GameManager = new function() {
 
   this.notifyClients = function(n) {
     this.npcs += n;
+    console.log(this.npcs);
   };
 
   this.notifyGlass = function() {
