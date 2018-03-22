@@ -26,6 +26,7 @@
     };
 })();
 
+/////////////// BEGIN GAME ///////////////
 const Game = new function() {
   let boards = [];
 
@@ -84,18 +85,18 @@ const Game = new function() {
     );
   };
 
-  var lastTime = new Date().getTime();
-  var maxTime = 1 / 30;
+  let lastTime = new Date().getTime();
+  const maxTime = 1 / 30;
   // Game Loop
   this.loop = function() {
-    var curTime = new Date().getTime();
+    let curTime = new Date().getTime();
     requestAnimationFrame(Game.loop);
-    var dt = (curTime - lastTime) / 1000;
+    let dt = (curTime - lastTime) / 1000;
     if (dt > maxTime) {
       dt = maxTime;
     }
 
-    for (var i = 0, len = boards.length; i < len; i++) {
+    for (let i = 0, len = boards.length; i < len; i++) {
       if (boards[i]) {
         boards[i].step(dt);
         boards[i].draw(Game.ctx);
@@ -120,7 +121,7 @@ const Game = new function() {
   };
 
   this.setupMobile = function() {
-    var container = document.getElementById('container'),
+    const container = document.getElementById('container'),
       hasTouch = !!('ontouchstart' in window),
       w = window.innerWidth,
       h = window.innerHeight;
@@ -163,37 +164,10 @@ const Game = new function() {
     this.canvas.style.top = '0px';
   };
 }();
+/////////////// END GAME ///////////////
 
-var SpriteSheet = new function() {
-  this.map = {};
-
-  this.load = function(spriteData, callback) {
-    this.map = spriteData;
-    this.image = new Image();
-    this.image.onload = callback;
-    this.image.src = 'img/sprites.png';
-  };
-
-  this.draw = function(ctx, sprite, x, y, frame) {
-    var s = this.map[sprite];
-    if (!frame) frame = 0;
-    ctx.drawImage(
-      this.image,
-      s.sx + frame * s.w,
-      s.sy,
-      s.w,
-      s.h,
-      Math.floor(x),
-      Math.floor(y),
-      s.w,
-      s.h
-    );
-  };
-
-  return this;
-}();
-
-var TitleScreen = function TitleScreen(title, subtitle, callback) {
+/////////////// BEGIN TITLE SCREEN ///////////////
+const TitleScreen = function TitleScreen(title, subtitle, callback) {
   let up = false;
   this.step = function(dt) {
     if (!Game.keys['space']) up = true;
@@ -213,11 +187,11 @@ var TitleScreen = function TitleScreen(title, subtitle, callback) {
     ctx.fillStyle = '#FFFFFF';
 
     ctx.font = 'bold 40px bangers';
-    var measure = ctx.measureText(title);
+    const measure = ctx.measureText(title);
     ctx.fillText(title, Game.width / 2 - measure.width / 2, Game.height / 2);
 
     ctx.font = 'bold 20px bangers';
-    var measure2 = ctx.measureText(subtitle);
+    const measure2 = ctx.measureText(subtitle);
     ctx.fillText(
       subtitle,
       Game.width / 2 - measure2.width / 2,
@@ -227,7 +201,9 @@ var TitleScreen = function TitleScreen(title, subtitle, callback) {
 
   this.reset = function() {};
 };
+/////////////// END TITLE SCREEN ///////////////
 
+/////////////// BEGIN GAME BOARD ///////////////
 const GameBoard = function() {
   let board = this;
   let active = false;
@@ -246,7 +222,7 @@ const GameBoard = function() {
 
   // Mark an object for removal
   this.remove = function(obj) {
-    var idx = this.removed.indexOf(obj);
+    const idx = this.removed.indexOf(obj);
     if (idx == -1) {
       this.removed.push(obj);
       return true;
@@ -262,8 +238,8 @@ const GameBoard = function() {
 
   // Removed an objects marked for removal from the list
   this.finalizeRemoved = function() {
-    for (var i = 0, len = this.removed.length; i < len; i++) {
-      var idx = this.objects.indexOf(this.removed[i]);
+    for (let i = 0, len = this.removed.length; i < len; i++) {
+      const idx = this.objects.indexOf(this.removed[i]);
       if (idx != -1) {
         this.cnt[this.removed[i].type]--;
         this.objects.splice(idx, 1);
@@ -274,16 +250,16 @@ const GameBoard = function() {
   // Call the same method on all current objects
   this.iterate = function(funcName) {
     if (!this.active) return;
-    var args = Array.prototype.slice.call(arguments, 1);
-    for (var i = 0, len = this.objects.length; i < len; i++) {
-      var obj = this.objects[i];
+    const args = Array.prototype.slice.call(arguments, 1);
+    for (let i = 0, len = this.objects.length; i < len; i++) {
+      const obj = this.objects[i];
       obj[funcName].apply(obj, args);
     }
   };
 
   // Find the first object for which func is true
   this.detect = function(func) {
-    for (var i = 0, val = null, len = this.objects.length; i < len; i++) {
+    for (let i = 0, val = null, len = this.objects.length; i < len; i++) {
       if (func.call(this.objects[i])) return this.objects[i];
     }
     return false;
@@ -318,7 +294,7 @@ const GameBoard = function() {
   this.collide = function(obj, type) {
     return this.detect(function() {
       if (obj != this) {
-        var col = (!type || this.type & type) && board.overlap(obj, this);
+        const col = (!type || this.type & type) && board.overlap(obj, this);
         return col ? this : false;
       }
     });
@@ -335,8 +311,39 @@ const GameBoard = function() {
     this.active = false;
   };
 };
+/////////////// END GAME BOARD ///////////////
 
-var Sprite = function() {};
+/////////////// BEGIN SPRITE ///////////////
+const SpriteSheet = new function() {
+  this.map = {};
+
+  this.load = function(spriteData, callback) {
+    this.map = spriteData;
+    this.image = new Image();
+    this.image.onload = callback;
+    this.image.src = 'img/sprites.png';
+  };
+
+  this.draw = function(ctx, sprite, x, y, frame) {
+    const s = this.map[sprite];
+    if (!frame) frame = 0;
+    ctx.drawImage(
+      this.image,
+      s.sx + frame * s.w,
+      s.sy,
+      s.w,
+      s.h,
+      Math.floor(x),
+      Math.floor(y),
+      s.w,
+      s.h
+    );
+  };
+
+  return this;
+}();
+
+const Sprite = function() {};
 
 Sprite.prototype.setup = function(sprite, props) {
   this.sprite = sprite;
@@ -348,7 +355,7 @@ Sprite.prototype.setup = function(sprite, props) {
 
 Sprite.prototype.merge = function(props) {
   if (props) {
-    for (var prop in props) {
+    for (let prop in props) {
       this[prop] = props[prop];
     }
   }
@@ -361,63 +368,90 @@ Sprite.prototype.draw = function(ctx) {
 Sprite.prototype.hit = function(damage) {
   this.board.remove(this);
 };
+/////////////// END SPRITE ///////////////
 
-var Level = function(levelData, callback) {
-  this.levelData = [];
-  for (var i = 0; i < levelData.length; i++) {
-    this.levelData.push(Object.create(levelData[i]));
+/////////////// BEGIN SPAWNER ///////////////
+const Spawner = function(pos, levelData, callback) {
+  this.initialLD = [];
+  this.pos = pos;
+  this.client = new Client(pos.x, pos.y, 100, 'NPC');
+  this.nclients = 0;
+
+  for (let i = 0; i < levelData.length; i++) {
+    this.initialLD.push(Object.create(levelData[i]));
+    this.nclients += (levelData[i][1] - levelData[i][0]) / levelData[i][2];
   }
-  this.t = 0;
+
   this.callback = callback;
+
+  this.reset = function() {
+    this.t = 0;
+    GameManager.notifyClients(this.nclients);
+    this.levelData = [];
+    for (let i = 0; i < this.initialLD.length; i++) {
+      this.levelData.push(Object.create(this.initialLD[i]));
+    }
+  };
+  this.reset();
 };
 
-Level.prototype.step = function(dt) {
-  var idx = 0,
-    remove = [],
-    curShip = null;
+Spawner.prototype.step = function(dt) {
+  let idx = 0;
+  let remove = [];
+  let curClient = null;
 
   // Update the current time offset
   this.t += dt * 1000;
 
-  //   Start, End,  Gap, Type,   Override
-  // [ 0,     4000, 500, 'step', { x: 100 } ]
-  while ((curShip = this.levelData[idx]) && curShip[0] < this.t + 2000) {
+  while ((curClient = this.levelData[idx]) && curClient[0] < this.t + 2000) {
     // Check if we've passed the end time
-    if (this.t > curShip[1]) {
-      remove.push(curShip);
-    } else if (curShip[0] < this.t) {
-      // Get the enemy definition blueprint
-      var enemy = enemies[curShip[3]],
-        override = curShip[4];
+    if (this.t > curClient[1]) {
+      remove.push(curClient);
+    } else if (curClient[0] < this.t) {
+      // Get the client definition blueprint
+      let client = clients[curClient[3]];
 
       // Add a new enemy with the blueprint and override
-      this.board.add(new Enemy(enemy, override));
+      this.board.add(
+        Object.create(this.client, {
+          vx: {
+            value: client.vx,
+            enumerable: true,
+          },
+          sprite: {
+            value: client.sprite,
+            enumerable: true,
+          },
+        })
+      );
 
       // Increment the start time by the gap
-      curShip[0] += curShip[2];
+      curClient[0] += curClient[2];
     }
     idx++;
   }
 
   // Remove any objects from the levelData that have passed
-  for (var i = 0, len = remove.length; i < len; i++) {
-    var remIdx = this.levelData.indexOf(remove[i]);
+  for (let i = 0, len = remove.length; i < len; i++) {
+    const remIdx = this.levelData.indexOf(remove[i]);
     if (remIdx != -1) this.levelData.splice(remIdx, 1);
   }
 
   // If there are no more enemies on the board or in
   // levelData, this level is done
-  if (this.levelData.length === 0 && this.board.cnt[OBJECT_ENEMY] === 0) {
+  if (this.levelData.length === 0 && this.board.cnt[OBJECT_CLIENT] === 0) {
     if (this.callback) this.callback();
   }
 };
 
-Level.prototype.draw = function(ctx) {};
+Spawner.prototype.draw = function(ctx) {};
+/////////////// END SPAWNER ///////////////
 
-var TouchControls = function() {
-  var gutterWidth = 10;
-  var unitWidth = Game.width / 5;
-  var blockWidth = unitWidth - gutterWidth;
+/////////////// BEGIN CONTROLS ///////////////
+const TouchControls = function() {
+  const gutterWidth = 10;
+  const unitWidth = Game.width / 5;
+  const blockWidth = unitWidth - gutterWidth;
 
   this.drawSquare = function(ctx, x, y, txt, on) {
     ctx.globalAlpha = on ? 0.9 : 0.6;
@@ -428,7 +462,7 @@ var TouchControls = function() {
     ctx.globalAlpha = 1.0;
     ctx.font = 'bold ' + 3 * unitWidth / 4 + 'px arial';
 
-    var txtSize = ctx.measureText(txt);
+    const txtSize = ctx.measureText(txt);
 
     ctx.fillText(
       txt,
@@ -440,7 +474,7 @@ var TouchControls = function() {
   this.draw = function(ctx) {
     ctx.save();
 
-    var yLoc = Game.height - unitWidth;
+    const yLoc = Game.height - unitWidth;
     this.drawSquare(ctx, gutterWidth, yLoc, '\u25C0', Game.keys['left']);
     this.drawSquare(
       ctx,
@@ -457,12 +491,13 @@ var TouchControls = function() {
   this.step = function(dt) {};
 
   this.trackTouch = function(e) {
-    var touch, x;
+    let touch;
+    let x;
 
     e.preventDefault();
     Game.keys['left'] = false;
     Game.keys['right'] = false;
-    for (var i = 0; i < e.targetTouches.length; i++) {
+    for (let i = 0; i < e.targetTouches.length; i++) {
       touch = e.targetTouches[i];
       x = touch.pageX / Game.canvasMultiplier - Game.canvas.offsetLeft;
       if (x < unitWidth) {
@@ -506,27 +541,4 @@ var TouchControls = function() {
 
   Game.playerOffset = unitWidth + 20;
 };
-
-var GamePoints = function() {
-  Game.points = 0;
-
-  var pointsLength = 8;
-
-  this.draw = function(ctx) {
-    ctx.save();
-    ctx.font = 'bold 18px arial';
-    ctx.fillStyle = '#FFFFFF';
-
-    var txt = '' + Game.points;
-    var i = pointsLength - txt.length,
-      zeros = '';
-    while (i-- > 0) {
-      zeros += '0';
-    }
-
-    ctx.fillText(zeros + txt, 10, 20);
-    ctx.restore();
-  };
-
-  this.step = function(dt) {};
-};
+/////////////// END CONTROLS ///////////////
