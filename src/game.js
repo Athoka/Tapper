@@ -149,22 +149,24 @@ window.addEventListener('load', function() {
 
 /////////////// BEGIN GAME MANAGER ///////////////
 const GameManager = new function() {
-  this.npcs = 0;
-  this.glasscount = 0;
-  this.dead = 0;
-
   this.reset = function() {
     this.npcs = 0;
     this.glasscount = 0;
+    this.beercount = 0;
     this.dead = 0;
   };
+  this.reset();
 
   this.notifyClients = function(n) {
     this.npcs += n;
-    console.log(this.npcs);
+  };
+
+  this.notifyBeer = function() {
+    ++this.beercount;
   };
 
   this.notifyGlass = function() {
+    --this.beercount;
     ++this.glasscount;
     this.check();
   };
@@ -184,7 +186,7 @@ const GameManager = new function() {
   this.check = function() {
     if (this.dead) {
       loseGame();
-    } else if (!this.npcs && !this.glasscount) {
+    } else if (!this.npcs && !this.glasscount && !this.beercount) {
       winGame();
     }
   };
