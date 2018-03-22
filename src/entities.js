@@ -91,7 +91,7 @@ Player.prototype.type = OBJECT_PLAYER;
  * This player moves or throws beer for every reload tick.
  * Long key press will trigger multiple actions.
  */
-var Player2 = function() {
+const Player2 = function() {
   this.setup('PLAYER', {
     fixedPos: [
       { x: 325, y: 90 },
@@ -164,7 +164,7 @@ Player2.prototype.type = OBJECT_PLAYER;
 /////////////// END PLAYER RELATED ENTITIES ///////////////
 
 /////////////// BEGIN NPC RELATED ENTITIES ///////////////
-var Glass = function(x, y, vx) {
+const Glass = function(x, y, vx) {
   this.setup('GLASS');
   this.x = x;
   this.y = y;
@@ -188,7 +188,7 @@ Glass.prototype.step = function(dt) {
   }
 };
 
-var Client = function(x, y, vx, sprite) {
+const Client = function(x, y, vx, sprite) {
   this.setup(sprite, { reloadTime: 0.25 });
   this.x = x;
   this.y = y;
@@ -241,7 +241,7 @@ const Leftwall = function() {
 
 Leftwall.prototype = new Sprite();
 
-var DeadZone = function(x, y) {
+const DeadZone = function(x, y) {
   this.x = x;
   this.y = y;
   this.w = 10;
