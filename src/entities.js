@@ -59,6 +59,7 @@ const Player = function() {
       this.currentPos = ++this.currentPos % this.fixedPos.length;
     } else if (freeSpace && Game.keys['space']) {
       freeSpace = false;
+      GameManager.notifyBeer();
       this.board.add(
         Object.create(this.beer, {
           x: {
@@ -135,6 +136,7 @@ const Player2 = function() {
     this.reload -= dt;
     if (Game.keys['space'] && this.reload < 0) {
       Game.keys['space'] = false;
+      GameManager.notifyBeer();
       this.reload = this.reloadTime;
 
       this.board.add(
