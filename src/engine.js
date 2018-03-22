@@ -379,7 +379,9 @@ const Spawner = function(pos, levelData, callback) {
 
   for (let i = 0; i < levelData.length; i++) {
     this.initialLD.push(Object.create(levelData[i]));
-    this.nclients += (levelData[i][1] - levelData[i][0]) / levelData[i][2];
+    this.nclients += Math.round(
+      (levelData[i][1] - levelData[i][0]) / levelData[i][2]
+    );
   }
 
   this.callback = callback;
